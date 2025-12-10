@@ -30,6 +30,12 @@
     let urlBar: HTMLInputElement = $state();
 
     $effect(() => {
+        if (view === 'home' && !proxyManager.isProxyOpen && urlBar) {
+            urlBar.focus();
+        }
+    });
+
+    $effect(() => {
         proxyManager.setProxyServer(proxyManager.proxyUrl);
     });
 
@@ -201,9 +207,7 @@
                 title="Destination URL"
                 placeholder="search anything..."
                 onkeydown={onEnterKeyPressed(startProxy)}
-                {@render (urlBar: HTMLInputElement) => {
-                    urlBar.focus();
-                }}
+                bind:this={urlBar}
                 bind:value={destinationInput}
             />
             <span
