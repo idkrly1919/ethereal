@@ -130,19 +130,14 @@
                     </p>
                     <input
                         class="input w-1/1 text-center bg-zinc-800 rounded-xl"
-                        bind:value={
-                            () =>
-                                config.useBare
-                                    ? config.bareCustomProxy
-                                    : config.wispCustomProxy,
-                            (v) => {
-                                if (config.useBare) {
-                                    config.bareCustomProxy = v;
-                                } else {
-                                    config.wispCustomProxy = v;
-                                }
+                        value={config.useBare ? config.bareCustomProxy : config.wispCustomProxy}
+                        on:input={(e) => {
+                            if (config.useBare) {
+                                config.bareCustomProxy = e.currentTarget.value;
+                            } else {
+                                config.wispCustomProxy = e.currentTarget.value;
                             }
-                        }
+                        }}
                     />
                 {/if}
                 <p class="flex items-center justify-center">adblock</p>

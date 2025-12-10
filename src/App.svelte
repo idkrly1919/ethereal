@@ -51,6 +51,7 @@
     let iframe: HTMLIFrameElement = $state();
 
     let searchbar: HTMLInputElement = $state()
+    let loader: HTMLSpanElement = $state();
 
     const iframeAllow =
         "accelerometer ambient-light-sensor attribution-reporting autoplay bluetooth browsing-topics camera compute-pressure " +
