@@ -38,7 +38,10 @@
         if (proxyChoice === 'scramjet') {
             // Scramjet Logic
             proxyManager.iframeUrl = `https://google-i39l.onrender.com/share/scramjet/${url}`;
-            // Manually open the proxy view without triggering the standard startProxy flow
+            proxyManager.isProxyOpen = true;
+        } else if (proxyChoice === 'noproxy') {
+            // No Proxy Logic
+            proxyManager.iframeUrl = url;
             proxyManager.isProxyOpen = true;
         } else {
             // verdis. Logic (Default)
@@ -53,19 +56,24 @@
 <div class="p-8 text-white bg-slate-950 min-h-screen relative">
     {#if !proxyChoice}
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl max-w-2xl w-full text-center shadow-2xl">
+            <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl max-w-4xl w-full text-center shadow-2xl">
                 <h2 class="text-3xl font-bold mb-2">Select Proxy</h2>
                 <p class="text-zinc-400 mb-8">Choose how you want to load games.</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <button class="group relative flex flex-col items-center justify-center p-6 bg-zinc-800 hover:bg-zinc-700 border-2 border-zinc-700 hover:border-blue-500 rounded-xl transition-all duration-300 cursor-pointer" onclick={() => setProxyChoice('scramjet')}>
                         <span class="text-2xl font-bold mb-2 text-blue-400">Scramjet</span>
-                        <p class="text-sm text-zinc-400 group-hover:text-zinc-200">all games work under scramjet and if u know me irl it will work</p>
+                        <p class="text-sm text-zinc-400 group-hover:text-zinc-200">scramjet works for 60% of schools</p>
                     </button>
                     
                     <button class="group relative flex flex-col items-center justify-center p-6 bg-zinc-800 hover:bg-zinc-700 border-2 border-zinc-700 hover:border-purple-500 rounded-xl transition-all duration-300 cursor-pointer" onclick={() => setProxyChoice('verdis')}>
                         <span class="text-2xl font-bold mb-2 text-purple-400">verdis.</span>
                         <p class="text-sm text-zinc-400 group-hover:text-zinc-200">70% of games work, works for everyone</p>
+                    </button>
+
+                    <button class="group relative flex flex-col items-center justify-center p-6 bg-zinc-800 hover:bg-zinc-700 border-2 border-zinc-700 hover:border-green-500 rounded-xl transition-all duration-300 cursor-pointer" onclick={() => setProxyChoice('noproxy')}>
+                        <span class="text-2xl font-bold mb-2 text-green-400">No Proxy</span>
+                        <p class="text-sm text-zinc-400 group-hover:text-zinc-200">works with all games 100% and it will work if ur at my school or u can try it</p>
                     </button>
                 </div>
             </div>
@@ -78,7 +86,7 @@
         <div class="flex items-center gap-4 w-full justify-end">
             {#if proxyChoice}
                 <button class="btn btn-ghost btn-sm text-zinc-500" onclick={() => setProxyChoice("")} title="Change Proxy Selection">
-                    {proxyChoice === 'scramjet' ? 'Scramjet' : 'verdis.'}
+                    {proxyChoice === 'scramjet' ? 'Scramjet' : proxyChoice === 'noproxy' ? 'No Proxy' : 'verdis.'}
                 </button>
             {/if}
             <div class="relative w-full max-w-md">

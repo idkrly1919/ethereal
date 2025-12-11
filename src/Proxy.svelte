@@ -17,16 +17,37 @@
         "allow-pointer-lock allow-presentation allow-same-origin allow-scripts allow-storage-access-by-user-activation";
 
     function onIframeLoad() {
-        // idek how this can happen but apparently it can
-        if (iframe == undefined) return;
-        // do not set proxyManager.url if the iframe hasn't hooked into the manager yet
-        const src = iframe.contentWindow.location.pathname;
-        if (!src.includes(proxyManager.uvConfig.prefix)) return;
+        if (!iframe) return;
 
-        iframeHasLoaded = true;
-        proxyManager.url = proxyManager.uvConfig.decodeUrl(
-            src.slice(proxyManager.uvConfig.prefix.length),
-        );
+        // Try to suppress alerts (only works for same-origin)
+        try {
+            const win = iframe.contentWindow;
+            if (win) {
+                win.alert = (msg) => console.log("Suppressed alert:", msg);
+                win.confirm = (msg) => { console.log("Suppressed confirm:", msg); return true; };
+            }
+        } catch (e) {
+            // Ignore cross-origin blocking
+        }
+
+        try {
+            const src = iframe.contentWindow.location.pathname;
+            
+            // For UV proxy, check if the path includes prefix
+            if (src.includes(proxyManager.uvConfig.prefix)) {
+                iframeHasLoaded = true;
+                proxyManager.url = proxyManager.uvConfig.decodeUrl(
+                    src.slice(proxyManager.uvConfig.prefix.length),
+                );
+            } else {
+                // If it's a direct load (same-origin but not proxy path), consider it loaded
+                iframeHasLoaded = true;
+            }
+        } catch (e) {
+            // Cross-origin access failed (Scramjet or No Proxy to external site)
+            // This means the iframe has loaded successfully
+            iframeHasLoaded = true;
+        }
     }
 </script>
 
