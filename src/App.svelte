@@ -15,14 +15,6 @@
         X,
         Gamepad2,
         Home,
-        Music,
-        MessageCircle,
-        Github,
-        Twitch,
-        Video,
-        Cpu,
-        Play,
-        Tv
     } from "@lucide/svelte";
     import { onMount } from "svelte";
     import { fade, fly, scale } from "svelte/transition";
@@ -119,7 +111,7 @@
     }
 
     // Typing effect for "Welcome to..."
-    let welcomeText = "your dream site.";
+    let welcomeText = "nexus"; 
     let typedText = $state("");
     let typingIndex = 0;
 
@@ -136,17 +128,21 @@
     });
 
     const shortcuts = [
-        { name: "Google", url: "https://google.com", color: "bg-white text-black", icon: Search },
-        { name: "YouTube", url: "https://youtube.com", color: "bg-white text-red-600", icon: Video },
-        { name: "Spotify", url: "https://spotify.com", color: "bg-green-500 text-white", icon: Music },
-        { name: "Discord", url: "https://discord.com", color: "bg-[#5865F2] text-white", icon: MessageCircle },
-        { name: "ChatGPT", url: "https://chatgpt.com", color: "bg-[#10a37f] text-white", icon: MessageCircle },
-        { name: "GeForce Now", url: "https://play.geforcenow.com", color: "bg-[#76b900] text-white", icon: Cpu },
-        { name: "GitHub", url: "https://github.com", color: "bg-black text-white", icon: Github },
-        { name: "Twitch", url: "https://twitch.tv", color: "bg-[#9146ff] text-white", icon: Twitch },
-        { name: "ESPN", url: "https://espn.com", color: "bg-[#cc0000] text-white", icon: Tv },
-        { name: "TikTok", url: "https://tiktok.com", color: "bg-black text-white", icon: Video },
+        { name: "Google", url: "https://google.com" },
+        { name: "YouTube", url: "https://www.youtube.com" },
+        { name: "Spotify", url: "https://open.spotify.com" },
+        { name: "Discord", url: "https://discord.com" },
+        { name: "ChatGPT", url: "https://chatgpt.com" },
+        { name: "GeForce Now", url: "https://play.geforcenow.com" },
+        { name: "GitHub", url: "https://github.com" },
+        { name: "Twitch", url: "https://twitch.tv" },
+        { name: "ESPN", url: "https://espn.com" },
+        { name: "TikTok", url: "https://tiktok.com" },
     ];
+
+    function getFavicon(url: string) {
+        return `https://www.google.com/s2/favicons?sz=128&domain=${url}`;
+    }
 
 </script>
 
@@ -216,10 +212,17 @@
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
                     <div class="relative flex items-center bg-black border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden h-14">
                         <div class="pl-4 text-zinc-500"><Search size={20} /></div>
+                        
+                        <!-- Custom Placeholder -->
+                        {#if destinationInput === ""}
+                            <span class="absolute left-14 text-zinc-500 text-lg pointer-events-none transition-opacity duration-200">
+                                Search <span class="font-bold text-zinc-400">verdis</span>.
+                            </span>
+                        {/if}
+
                         <input
                             type="text"
-                            class="w-full h-full bg-transparent border-none text-lg px-4 text-white placeholder-zinc-500 focus:outline-none focus:ring-0"
-                            placeholder="Search Space..."
+                            class="w-full h-full bg-transparent border-none text-lg px-4 text-white focus:outline-none focus:ring-0 relative z-10"
                             bind:this={urlBar}
                             bind:value={destinationInput}
                             onkeydown={onEnterKeyPressed(() => startProxy())}
@@ -231,13 +234,13 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {#each shortcuts as shortcut}
                         <button 
-                            class="flex items-center gap-3 p-4 {shortcut.color} rounded-xl shadow-lg hover:scale-105 transition-transform duration-200 text-left overflow-hidden group relative"
+                            class="flex items-center gap-3 p-4 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800/50 hover:border-zinc-700 rounded-xl shadow-lg hover:scale-105 transition-all duration-200 text-left overflow-hidden group relative"
                             onclick={() => startProxy(shortcut.url)}
                         >
-                            <div class="shrink-0">
-                                <shortcut.icon size={24} />
+                            <div class="shrink-0 w-8 h-8 rounded-full bg-white/5 p-1 flex items-center justify-center">
+                                <img src={getFavicon(shortcut.url)} alt={shortcut.name} class="w-full h-full object-contain rounded-sm" />
                             </div>
-                            <span class="font-bold text-sm truncate w-full">{shortcut.name}</span>
+                            <span class="font-bold text-sm truncate w-full text-zinc-300 group-hover:text-white transition-colors">{shortcut.name}</span>
                         </button>
                     {/each}
                 </div>
