@@ -263,4 +263,3 @@
         <Games bind:view />
     {/if}
 {/if}
-</script>
