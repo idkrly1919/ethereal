@@ -15,6 +15,11 @@
     });
 
     function playGame(url: string) {
+        if (!proxyManager.startProxy(url)) {
+            alert("The proxy service is not ready yet. Please wait a few seconds for the connection to establish and try again.");
+            return;
+        }
+
         // Cloaking
         document.title = "Classroom";
         const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
@@ -26,8 +31,6 @@
             newLink.href = "/Google_Classroom_Logo.svg.png";
             document.head.appendChild(newLink);
         }
-
-        proxyManager.startProxy(url);
     }
 </script>
 

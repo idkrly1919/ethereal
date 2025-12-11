@@ -18,12 +18,26 @@
         X,
         Gamepad2
     } from "@lucide/svelte";
+    import { onMount } from "svelte";
 
     $effect(() => {
         if (config.useBare && config.bareSelectedProxy === "auto") {
             autoProxyProber.probeBare();
         } else if (config.wispSelectedProxy === "auto") {
             autoProxyProber.probeWisp();
+        }
+    });
+
+    onMount(() => {
+        // Initialize theme, title, favicon
+        if (document) {
+            document.title = localStorage.getItem("tabTitle") || "verdis.";
+            const faviconElement = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+            if (faviconElement) {
+                faviconElement.href = localStorage.getItem("faviconUrl") || "logo.png";
+            }
+            window.document.documentElement.style.setProperty("--color-blue-500", localStorage.getItem("theme") || "#2b7fff")
+            window.document.documentElement.style.setProperty("--color-slate-950", localStorage.getItem("bgColor") || "#0d1117")
         }
     });
 
@@ -249,3 +263,4 @@
         <Games bind:view />
     {/if}
 {/if}
+</script>

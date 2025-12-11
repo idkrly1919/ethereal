@@ -22,29 +22,18 @@
         proxyManager.updateSWConfig(new ServiceWorkerConfig(config.adblock));
     });
 
-    if (document.title) {
-        document.title = localStorage.getItem("tabTitle") || "verdis.";
-    }
-
     const faviconElement =
         document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-
-    if (faviconElement) {
-        faviconElement.href = localStorage.getItem("faviconUrl") || "logo.png";
-    }
 
     let titleInput;
     let faviconInput;
 
-    if (titleInput && faviconInput) {
-        titleInput.value = localStorage.getItem("tabTitle");
-        faviconInput.value = localStorage.getItem("faviconUrl");
-    }
-
-    if (document) {
-        window.document.documentElement.style.setProperty("--color-blue-500", localStorage.getItem("theme") || "#2b7fff")
-        window.document.documentElement.style.setProperty("--color-slate-950", localStorage.getItem("bgColor") || "#0d1117")
-    }
+    $effect(() => {
+        if (titleInput && faviconInput) {
+            titleInput.value = localStorage.getItem("tabTitle") || "";
+            faviconInput.value = localStorage.getItem("faviconUrl") || "";
+        }
+    });
 </script>
 
 <dialog
@@ -190,13 +179,13 @@
                             var win = window.open()
                             const url = window.location.href || "https://etherealproxy.netlify.app"
 
-                            win.document.body.style.margin = 0
+                            win.document.body.style.margin = "0"
                             win.document.body.style.height = "100vh"
                             var iframe = win.document.createElement('iframe')
                             iframe.style.border = "none"
                             iframe.style.width = "100%"
                             iframe.style.height = "100vh"
-                            iframe.style.margin = 0
+                            iframe.style.margin = "0"
                             iframe.src = url 
                             win.document.body.appendChild(iframe)
                         }}>open a:b</button
