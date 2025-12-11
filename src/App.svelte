@@ -6,6 +6,7 @@
     import autoProxyProber from "./prober.svelte";
     import { History } from "./history";
     import Games from "./Games.svelte";
+    import Classroom from "./classroom/Classroom.svelte";
     import {
         Search,
         Settings2,
@@ -14,14 +15,6 @@
         ArrowLeft,
         X,
         Gamepad2,
-        Home,
-        Music,
-        MessageCircle,
-        Github,
-        Twitch,
-        Video,
-        Cpu,
-        Tv
     } from "@lucide/svelte";
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
@@ -65,8 +58,9 @@
     });
 
     let destinationInput = $state("");
-    let view = $state("welcome"); // welcome, home, games
+    let view = $state("classroom"); // classroom -> welcome -> home -> games
     let isConfigOpen = $state(false);
+    let isWarping = $state(false);
 
     function startProxy(url?: string) {
         const dest = url || destinationInput;
@@ -120,19 +114,23 @@
     // Typing effect for "Welcome to..."
     let welcomeText = "verdis."; 
     let typedText = $state("");
-    let typingIndex = 0;
 
     $effect(() => {
-        if (view === 'welcome') {
-            if (typingIndex < welcomeText.length) {
-                const timeout = setTimeout(() => {
-                    typedText += welcomeText[typingIndex];
-                    typingIndex++;
-                }, 100);
-                return () => clearTimeout(timeout);
-            }
+        if (view === 'welcome' && typedText.length < welcomeText.length) {
+            const timeout = setTimeout(() => {
+                typedText = welcomeText.slice(0, typedText.length + 1);
+            }, 150);
+            return () => clearTimeout(timeout);
         }
     });
+
+    function triggerWarp() {
+        isWarping = true;
+        setTimeout(() => {
+            view = 'home';
+            isWarping = false;
+        }, 2000);
+    }
 
     const shortcuts = [
         { name: "Google", url: "https://google.com" },
@@ -153,15 +151,17 @@
 
 </script>
 
-<div class="min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-hidden relative">
-    <Config bind:isConfigOpen></Config>
-
-    <!-- Global Background Elements -->
-    <div class="fixed inset-0 z-0 pointer-events-none">
-        <div class="stars absolute inset-0"></div>
+<!-- Only show star background when NOT in classroom view -->
+{#if view !== 'classroom'}
+    <div class="fixed inset-0 z-0 pointer-events-none bg-black">
+        <div class="stars absolute inset-0 {isWarping ? 'warp' : ''}"></div>
         <!-- Blue Glow at Bottom -->
         <div class="absolute bottom-0 left-0 right-0 h-[60vh] bg-gradient-to-t from-blue-900/60 via-blue-900/20 to-transparent opacity-80 blur-3xl"></div>
     </div>
+{/if}
+
+<div class="min-h-screen text-white font-sans selection:bg-blue-500/30 overflow-hidden relative">
+    <Config bind:isConfigOpen></Config>
 
     {#if proxyManager.isProxyOpen}
         <!-- Proxy View -->
@@ -200,13 +200,19 @@
             </div>
         </div>
 
+    {:else if view === 'classroom'}
+        <!-- Google Classroom Clone -->
+        <div class="relative z-10" transition:fade={{ duration: 300 }}>
+            <Classroom enterApp={() => view = 'welcome'} />
+        </div>
+
     {:else if view === 'games'}
         <div class="relative z-10">
             <Games bind:view />
         </div>
     {:else if view === 'home'}
         <!-- Dashboard Home -->
-        <div class="relative z-10 min-h-screen flex flex-col items-center justify-center p-4" transition:fade={{ duration: 400 }}>
+        <div class="relative z-10 min-h-screen flex flex-col items-center justify-center p-4" transition:fade={{ duration: 1000 }}>
             <!-- Navigation Header -->
             <div class="absolute top-6 right-6 flex gap-4">
                 <button class="p-2 text-zinc-400 hover:text-white transition-colors" onclick={() => view = 'games'} title="Games"><Gamepad2 /></button>
@@ -263,8 +269,8 @@
             <p class="text-zinc-400 text-xl mb-12 font-light">Start your unblocking journey today!</p>
             
             <button 
-                class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full font-bold text-lg hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105 transition-all duration-300 flex items-center gap-2 group"
-                onclick={() => view = 'home'}
+                class="glass-button px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 flex items-center gap-2 group"
+                onclick={triggerWarp}
             >
                 Get Started
                 <span class="group-hover:translate-x-1 transition-transform">✨</span>
@@ -274,9 +280,27 @@
 </div>
 
 <style>
-    /* Simple Star Animation */
+    /* Liquid Glass Button */
+    .glass-button {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .glass-button:hover {
+        background: linear-gradient(to right, #2563eb, #9333ea);
+        border-color: transparent;
+        box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
+        transform: scale(1.05);
+    }
+
+    /* Star Animation with 35% more stars */
     .stars {
         background-image: 
+            /* Original stars */
             radial-gradient(1px 1px at 10% 10%, #fff, rgba(0,0,0,0)),
             radial-gradient(1.5px 1.5px at 20% 30%, #fff, rgba(0,0,0,0)),
             radial-gradient(1px 1px at 30% 70%, #fff, rgba(0,0,0,0)),
@@ -285,10 +309,24 @@
             radial-gradient(1.5px 1.5px at 60% 20%, #fff, rgba(0,0,0,0)),
             radial-gradient(1px 1px at 70% 50%, #fff, rgba(0,0,0,0)),
             radial-gradient(2px 2px at 80% 80%, #fff, rgba(0,0,0,0)),
-            radial-gradient(1px 1px at 90% 10%, #fff, rgba(0,0,0,0));
+            radial-gradient(1px 1px at 90% 10%, #fff, rgba(0,0,0,0)),
+            /* 35% more stars */
+            radial-gradient(1px 1px at 15% 15%, #fff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 25% 35%, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 35% 75%, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 45% 45%, #fff, rgba(0,0,0,0));
         background-size: 550px 550px;
         animation: star-move 60s linear infinite;
         opacity: 0.7;
+        transition: animation-duration 2s ease-in-out, transform 2s ease-in-out, opacity 2s ease-in-out;
+    }
+
+    .stars.warp {
+        animation-duration: 0.2s; /* Really fast */
+        transform: scale(1.5); /* Slight zoom for trails effect feeling */
+        opacity: 1;
+        /* Simulate trails with a blur in motion */
+        filter: blur(1px);
     }
 
     @keyframes star-move {
