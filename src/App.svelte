@@ -16,6 +16,8 @@
         ArrowLeft,
         X,
         Gamepad2,
+        Maximize2,
+        Settings
     } from "@lucide/svelte";
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
@@ -45,6 +47,7 @@
         }
     });
 
+    // We only bind one urlBar at a time depending on view
     let urlBar: HTMLInputElement = $state();
     let searchbar: HTMLInputElement = $state();
 
@@ -162,14 +165,13 @@
 
 </script>
 
-<!-- Only show star background when NOT in classroom view -->
 {#if view !== 'classroom'}
     <div class="fixed inset-0 z-0 pointer-events-none bg-black overflow-hidden">
         <div class="star-container {isWarping ? 'warp' : ''}">
             <div class="stars"></div>
         </div>
-        <!-- Blue Glow at Bottom -->
-        <div class="absolute bottom-0 left-0 right-0 h-[60vh] bg-gradient-to-t from-blue-900/60 via-blue-900/20 to-transparent opacity-80 blur-3xl"></div>
+        <!-- Purple Glow at Bottom Center -->
+        <div class="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[80vw] h-[60vh] bg-[#7c3aed] opacity-20 blur-[120px] rounded-full pointer-events-none"></div>
     </div>
 {/if}
 
@@ -177,10 +179,10 @@
     <Config bind:isConfigOpen></Config>
 
     {#if proxyManager.isProxyOpen}
-        <!-- Proxy View Container with vertical layout to not hide content -->
+        <!-- Proxy View Container: Flex Column -->
         <div class="fixed inset-0 z-10 flex flex-col" transition:fade={{ duration: 300 }}>
-            <!-- Iframe Container -->
-            <div class="flex-1 relative w-full overflow-hidden bg-white/5 backdrop-blur-sm rounded-b-2xl mx-auto border-x border-b border-white/10 shadow-2xl">
+            <!-- Iframe Container - Takes remaining space -->
+            <div class="flex-1 relative w-full overflow-hidden bg-black">
                 <iframe
                     bind:this={iframe}
                     title="Proxy"
@@ -192,8 +194,9 @@
                 ></iframe>
             </div>
 
-            <!-- Dock Container (Fixed height, taking space) -->
-            <div class="h-24 shrink-0 flex items-center justify-center relative">
+            <!-- Dock Container - Fixed Height at Bottom -->
+            <!-- The background here is transparent so stars show through -->
+            <div class="h-24 shrink-0 flex items-center justify-center relative bg-gradient-to-t from-black/80 to-transparent">
                 <!-- Floating Control Dock -->
                 <div class="flex items-center gap-2 p-2 bg-zinc-900/90 backdrop-blur-xl border border-zinc-800/50 rounded-full shadow-2xl shadow-black/50 transition-all hover:scale-[1.02] hover:bg-zinc-900">
                     <div class="flex items-center gap-1 px-2 border-r border-zinc-800">
