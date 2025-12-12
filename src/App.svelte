@@ -7,14 +7,18 @@
     import { History } from "./history";
     import Games from "./Games.svelte";
     import Classroom from "./classroom/Classroom.svelte";
+    import { brandIcons } from "./icons";
     import {
         Search,
-        Settings2,
+        Settings,
         RotateCw,
         ArrowRight,
         ArrowLeft,
         X,
         Gamepad2,
+        Maximize2,
+        Code,
+        Home
     } from "@lucide/svelte";
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
@@ -58,7 +62,7 @@
     });
 
     let destinationInput = $state("");
-    let view = $state("classroom"); // classroom -> welcome -> home -> games
+    let view = $state("classroom"); 
     let isConfigOpen = $state(false);
     let isWarping = $state(false);
 
@@ -111,58 +115,50 @@
         proxyManager.reloadIframe();
     }
 
-    // Typing effect for "Welcome to..."
-    let welcomeText = "verdis."; 
-    let typedText = $state("v");
-
-    $effect(() => {
-        if (view === 'welcome' && typedText.length < welcomeText.length) {
-            const timeout = setTimeout(() => {
-                typedText = welcomeText.slice(0, typedText.length + 1);
-            }, 150);
-            return () => clearTimeout(timeout);
-        }
-    });
-
     function triggerWarp() {
         isWarping = true;
         setTimeout(() => {
             view = 'home';
             isWarping = false;
-        }, 2000);
+        }, 1500);
     }
 
     const shortcuts = [
-        { name: "Google", url: "https://google.com" },
-        { name: "YouTube", url: "https://www.youtube.com" },
-        { name: "Spotify", url: "https://open.spotify.com" },
-        { name: "Discord", url: "https://discord.com" },
-        { name: "ChatGPT", url: "https://chatgpt.com" },
-        { name: "GeForce Now", url: "https://play.geforcenow.com" },
-        { name: "GitHub", url: "https://github.com" },
-        { name: "Twitch", url: "https://twitch.tv" },
-        { name: "ESPN", url: "https://espn.com" },
-        { name: "TikTok", url: "https://tiktok.com" },
+        { name: "Google", url: "https://google.com", style: "bg-white text-black", logo: brandIcons.Google },
+        { name: "YouTube", url: "https://www.youtube.com", style: "bg-white text-black", logo: brandIcons.YouTube },
+        { name: "Spotify", url: "https://open.spotify.com", style: "bg-[#1DB954] text-white", logo: brandIcons.Spotify },
+        { name: "Discord", url: "https://discord.com", style: "bg-[#5865F2] text-white", logo: brandIcons.Discord },
+        { name: "ChatGPT", url: "https://chatgpt.com", style: "bg-[#10A37F] text-white", textLogo: "ChatGPT", logo: null },
+        { name: "GeForce Now", url: "https://play.geforcenow.com", style: "bg-[#76B900] text-black", textLogo: "GEFORCE NOW", logo: null },
+        { name: "GitHub", url: "https://github.com", style: "bg-[#181717] text-white", logo: brandIcons.GitHub },
+        { name: "Twitch", url: "https://twitch.tv", style: "bg-[#9146FF] text-white", logo: brandIcons.Twitch },
+        { name: "ESPN", url: "https://espn.com", style: "bg-[#CC0000] text-white", textLogo: "ESPN", logo: null },
+        { name: "TikTok", url: "https://tiktok.com", style: "bg-black text-white", logo: brandIcons.TikTok },
     ];
 
-    function getFavicon(url: string) {
-        return `https://www.google.com/s2/favicons?sz=128&domain=${url}`;
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
     }
 
 </script>
 
-<!-- Only show star background when NOT in classroom view -->
 {#if view !== 'classroom'}
     <div class="fixed inset-0 z-0 pointer-events-none bg-black overflow-hidden">
         <div class="star-container {isWarping ? 'warp' : ''}">
             <div class="stars"></div>
         </div>
-        <!-- Blue Glow at Bottom -->
-        <div class="absolute bottom-0 left-0 right-0 h-[60vh] bg-gradient-to-t from-blue-900/60 via-blue-900/20 to-transparent opacity-80 blur-3xl"></div>
+        <!-- Purple Glow at Bottom Center -->
+        <div class="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[80vw] h-[60vh] bg-[#7c3aed] opacity-20 blur-[120px] rounded-full pointer-events-none"></div>
     </div>
 {/if}
 
-<div class="min-h-screen text-white font-sans selection:bg-blue-500/30 overflow-hidden relative">
+<div class="min-h-screen text-white font-sans selection:bg-purple-500/30 overflow-hidden relative">
     <Config bind:isConfigOpen></Config>
 
     {#if proxyManager.isProxyOpen}
@@ -189,7 +185,7 @@
             <div class="relative w-64 group">
                 <input
                     type="text"
-                    class="w-full h-9 pl-3 pr-10 bg-zinc-950/50 border border-zinc-800 rounded-full text-xs text-zinc-300 focus:outline-none focus:border-blue-500/50 focus:text-white transition-all text-center group-hover:text-left"
+                    class="w-full h-9 pl-3 pr-10 bg-zinc-950/50 border border-zinc-800 rounded-full text-xs text-zinc-300 focus:outline-none focus:border-[#8b5cf6]/50 focus:text-white transition-all text-center group-hover:text-left"
                     value={proxyManager.url}
                     bind:this={searchbar}
                     onkeydown={onEnterKeyPressed(() => { proxyManager.setDestination(searchbar.value); proxyManager.reloadIframe(); })}
@@ -197,7 +193,7 @@
                 />
             </div>
             <div class="flex items-center gap-1 px-2 border-l border-zinc-800">
-                <button class="btn btn-ghost btn-circle btn-sm text-zinc-400 hover:text-white hover:bg-zinc-800" onclick={() => (isConfigOpen = true)}><Settings2 size={18} /></button>
+                <button class="btn btn-ghost btn-circle btn-sm text-zinc-400 hover:text-white hover:bg-zinc-800" onclick={() => (isConfigOpen = true)}><Settings size={18} /></button>
                 <button class="btn btn-ghost btn-circle btn-sm text-red-400 hover:text-red-300 hover:bg-red-500/10" onclick={() => (proxyManager.isProxyOpen = false)}><X size={18} /></button>
             </div>
         </div>
@@ -214,48 +210,73 @@
         </div>
     {:else if view === 'home'}
         <!-- Dashboard Home -->
-        <div class="relative z-10 min-h-screen flex flex-col items-center justify-center p-4" transition:fade={{ duration: 1000 }}>
-            <!-- Navigation Header -->
-            <div class="absolute top-6 right-6 flex gap-4">
-                <button class="p-2 text-zinc-400 hover:text-white transition-colors" onclick={() => view = 'games'} title="Games"><Gamepad2 /></button>
-                <button class="p-2 text-zinc-400 hover:text-white transition-colors" onclick={() => isConfigOpen = true} title="Settings"><Settings2 /></button>
-            </div>
-
-            <div class="w-full max-w-4xl flex flex-col gap-12 mt-[-5vh]">
-                <!-- Search Bar -->
-                <div class="relative group w-full max-w-2xl mx-auto">
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-                    <div class="relative flex items-center bg-black border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden h-14">
-                        <div class="pl-4 text-zinc-500"><Search size={20} /></div>
-                        
-                        <!-- Custom Placeholder -->
-                        {#if destinationInput === ""}
-                            <span class="absolute left-14 text-zinc-500 text-lg pointer-events-none transition-opacity duration-200">
-                                Search <span class="font-bold text-zinc-400">verdis.</span> or enter URL
-                            </span>
-                        {/if}
-
-                        <input
-                            type="text"
-                            class="w-full h-full bg-transparent border-none text-lg px-4 text-white focus:outline-none focus:ring-0 relative z-10"
+        <div class="relative z-10 min-h-screen flex flex-col p-4" transition:fade={{ duration: 800 }}>
+            <!-- Top Navigation -->
+            <div class="absolute top-0 left-0 right-0 h-14 flex items-center justify-between px-6 z-20 border-b border-white/5 bg-black/20 backdrop-blur-sm">
+                <div class="flex items-center gap-2">
+                    <button class="p-2 text-zinc-400 hover:text-white transition-colors"><ArrowLeft size={18} /></button>
+                    <button class="p-2 text-zinc-400 hover:text-white transition-colors"><RotateCw size={16} /></button>
+                    <button class="p-2 text-zinc-400 hover:text-white transition-colors"><ArrowRight size={18} /></button>
+                </div>
+                
+                <div class="flex-1 max-w-2xl mx-4">
+                    <div class="relative group">
+                        <Search class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
+                        <input 
+                            type="text" 
+                            placeholder="Enter search or web address" 
+                            class="w-full bg-zinc-900/50 border border-zinc-800 rounded-full py-2 pl-10 pr-4 text-sm text-zinc-300 focus:outline-none focus:border-zinc-700 transition-colors"
+                            onkeydown={onEnterKeyPressed(() => startProxy(urlBar.value))}
                             bind:this={urlBar}
-                            bind:value={destinationInput}
-                            onkeydown={onEnterKeyPressed(() => startProxy())}
                         />
                     </div>
                 </div>
 
+                <div class="flex items-center gap-2">
+                    <button class="p-2 text-zinc-400 hover:text-white transition-colors" onclick={() => view = 'home'}><Home size={18} /></button>
+                    <button class="p-2 text-zinc-400 hover:text-white transition-colors" onclick={() => window.open('https://github.com/tenclips/verdis', '_blank')}><Code size={18} /></button>
+                    <button class="p-2 text-zinc-400 hover:text-white transition-colors" onclick={toggleFullscreen}><Maximize2 size={18} /></button>
+                    <button class="p-2 text-zinc-400 hover:text-white transition-colors" onclick={() => isConfigOpen = true}><Settings size={18} /></button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col items-center justify-center -mt-16 w-full max-w-5xl mx-auto">
+                
+                <!-- Center Search -->
+                <div class="w-full max-w-lg mb-12 relative group">
+                    <div class="relative flex items-center bg-[#0a0a0a] border border-zinc-800 rounded-full h-12 px-4 shadow-lg transition-colors group-hover:border-zinc-700">
+                        <img src="/Google_Classroom_Logo.svg.png" alt="Icon" class="w-5 h-5 mr-3 opacity-80" />
+                        <input
+                            type="text"
+                            class="w-full bg-transparent border-none text-zinc-300 placeholder-zinc-600 focus:outline-none focus:ring-0 text-sm"
+                            placeholder="Search Space..."
+                            bind:value={destinationInput}
+                            onkeydown={onEnterKeyPressed(() => startProxy())}
+                        />
+                        <Search size={16} class="text-zinc-600 ml-2" />
+                    </div>
+                </div>
+
                 <!-- Shortcuts Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 w-full">
                     {#each shortcuts as shortcut}
                         <button 
-                            class="flex items-center gap-3 p-4 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800/50 hover:border-zinc-700 rounded-xl shadow-lg hover:scale-105 transition-all duration-200 text-left overflow-hidden group relative"
+                            class="h-16 rounded-xl flex items-center justify-center relative overflow-hidden transition-transform hover:scale-[1.02] shadow-lg {shortcut.style}"
                             onclick={() => startProxy(shortcut.url)}
                         >
-                            <div class="shrink-0 w-8 h-8 rounded-full bg-white/5 p-1 flex items-center justify-center">
-                                <img src={getFavicon(shortcut.url)} alt={shortcut.name} class="w-full h-full object-contain rounded-sm" />
-                            </div>
-                            <span class="font-bold text-sm truncate w-full text-zinc-300 group-hover:text-white transition-colors">{shortcut.name}</span>
+                            {#if shortcut.logo}
+                                <svg viewBox="0 0 24 24" class="h-6 w-auto fill-current" xmlns="http://www.w3.org/2000/svg">
+                                    {@html shortcut.logo}
+                                </svg>
+                                {#if shortcut.name === "Google" || shortcut.name === "YouTube" || shortcut.name === "Discord" || shortcut.name === "GitHub" || shortcut.name === "Twitch" || shortcut.name === "TikTok"}
+                                    <span class="ml-2 font-bold text-lg tracking-tight {shortcut.name === 'YouTube' ? 'tracking-tighter' : ''}">{shortcut.name}</span>
+                                {/if}
+                            {:else if shortcut.textLogo}
+                                <span class="font-black text-lg italic tracking-tighter">{shortcut.textLogo}</span>
+                            {:else}
+                                <span class="font-bold">{shortcut.name}</span>
+                            {/if}
                         </button>
                     {/each}
                 </div>
@@ -265,20 +286,19 @@
     {:else}
         <!-- Welcome Screen -->
         <div class="relative z-10 min-h-screen flex flex-col items-center justify-center text-center p-4">
-            <!-- Fade out wrapper for warp effect -->
             {#if !isWarping}
                 <div class="flex flex-col items-center justify-center" transition:fade={{ duration: 500 }}>
-                    <h1 class="text-6xl md:text-7xl font-bold mb-4 tracking-tight">
-                        Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">{typedText}</span><span class="animate-pulse text-blue-400">|</span>
+                    <h1 class="text-5xl md:text-7xl font-bold mb-4 tracking-tight text-white">
+                        Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-500">amazing.</span><span class="animate-pulse text-purple-500">|</span>
                     </h1>
-                    <p class="text-zinc-400 text-xl mb-12 font-light">Start your unblocking journey today!</p>
+                    <p class="text-zinc-400 text-lg mb-10 font-light tracking-wide">Start your unblocking journey today!</p>
                     
                     <button 
-                        class="glass-button px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 flex items-center gap-2 group"
+                        class="bg-gradient-to-r from-[#7c3aed] to-[#9333ea] text-white px-8 py-3.5 rounded-full font-bold text-sm transition-all duration-300 flex items-center gap-2 hover:shadow-[0_0_20px_rgba(124,58,237,0.5)] hover:scale-105 active:scale-95"
                         onclick={triggerWarp}
                     >
                         Get Started
-                        <span class="group-hover:translate-x-1 transition-transform">✨</span>
+                        <span class="text-lg">✨</span>
                     </button>
                 </div>
             {/if}
@@ -287,30 +307,14 @@
 </div>
 
 <style>
-    /* Liquid Glass Button */
-    .glass-button {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .glass-button:hover {
-        background: linear-gradient(to right, #2563eb, #9333ea);
-        border-color: transparent;
-        box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
-        transform: scale(1.05);
-    }
-
-    /* Optimized Star Animation */
+    /* Optimized Star Animation - GPU Accelerated */
     .star-container {
         position: absolute;
         width: 100%;
         height: 100%;
         perspective: 1000px;
         transform-style: preserve-3d;
+        will-change: transform; /* Hint to browser to promote to layer */
     }
 
     .stars {
@@ -318,41 +322,42 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 300%; /* Triple height for smooth looping */
+        height: 400%; /* Quadruple height for even smoother looping at high speeds */
         background-image: 
-            /* Original stars */
-            radial-gradient(1px 1px at 10% 10%, #fff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 10% 10%, #fff, rgba(0,0,0,0)),
             radial-gradient(1.5px 1.5px at 20% 30%, #fff, rgba(0,0,0,0)),
             radial-gradient(1px 1px at 30% 70%, #fff, rgba(0,0,0,0)),
             radial-gradient(2px 2px at 40% 40%, #fff, rgba(0,0,0,0)),
-            radial-gradient(1px 1px at 50% 90%, #fff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 50% 90%, #fff, rgba(0,0,0,0)),
             radial-gradient(1.5px 1.5px at 60% 20%, #fff, rgba(0,0,0,0)),
             radial-gradient(1px 1px at 70% 50%, #fff, rgba(0,0,0,0)),
             radial-gradient(2px 2px at 80% 80%, #fff, rgba(0,0,0,0)),
             radial-gradient(1px 1px at 90% 10%, #fff, rgba(0,0,0,0)),
-            /* 35% more stars */
-            radial-gradient(1px 1px at 15% 15%, #fff, rgba(0,0,0,0)),
+            radial-gradient(1.5px 1.5px at 15% 15%, #fff, rgba(0,0,0,0)),
             radial-gradient(1.5px 1.5px at 25% 35%, #fff, rgba(0,0,0,0)),
-            radial-gradient(1px 1px at 35% 75%, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 35% 75%, #fff, rgba(0,0,0,0)),
             radial-gradient(2px 2px at 45% 45%, #fff, rgba(0,0,0,0));
-        background-size: 550px 550px;
+        background-size: 800px 800px; /* Larger pattern */
         background-repeat: repeat;
-        animation: star-scroll 60s linear infinite;
+        animation: star-scroll 120s linear infinite;
         opacity: 0.7;
-        /* Smooth transitions for warp effect */
-        transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
     }
 
+    /* Warp Effect */
     .star-container.warp .stars {
-        animation-duration: 0.2s; /* Extremely fast looping to simulate high speed */
-        /* Stretch stars vertically to create "trails" */
-        transform: scaleY(20); 
-        opacity: 0.5; /* Fade out slightly to look like motion blur trails */
-        filter: blur(1px);
+        animation: star-scroll 0.2s linear infinite; /* Very fast */
+        opacity: 0.8;
+        transform: scaleY(15); /* Stretch vertically for trail effect */
+        transform-origin: center;
+        filter: blur(1px); /* Slight blur for speed sensation */
     }
     
+    .star-container.warp {
+        transition: all 2s ease-in;
+    }
+
     @keyframes star-scroll {
-        from { transform: translateY(0); }
-        to { transform: translateY(-33.33%); } /* Move up by 1/3 since height is 300% */
+        from { transform: translateY(0) translateZ(0); } /* Hardware accel */
+        to { transform: translateY(-25%) translateZ(0); } /* Move up by 1/4 since height is 400% */
     }
 </style>
